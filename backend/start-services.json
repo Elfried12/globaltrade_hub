@@ -1,0 +1,37 @@
+{
+    "services": [
+      {
+        "name": "admin-service",
+        "path": "./admin-service"
+      },
+      {
+        "name": "auth-service",
+        "path": "./auth-service"
+      },
+      {
+        "name": "users-service",
+        "path": "./users-service"
+      },
+      {
+        "name": "products-service",
+        "path": "./products-service"
+      },
+      {
+        "name": "contacts-service",
+        "path": "./contacts-service"
+      },
+      {
+        "name": "transactions-service",
+        "path": "./transactions-service"
+      },
+      {
+        "name": "logistics-service",
+        "path": "./logistics-service"
+      },
+      {
+        "name": "notifications-service",
+        "path": "./notifications-service"
+      }
+    ]
+  }
+  

@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:admin": "cd admin-service && npm run start:dev",
+    "start:auth": "cd auth-service && npm run start:dev",
+    "start:users": "cd users-service && npm run start:dev",
+    "start:products": "cd products-service && npm run start:dev",
+    "start:contacts": "cd contacts-service && npm run start:dev",
+    "start:transactions": "cd transactions-service && npm run start:dev",
+    "start:logistics": "cd logistics-service && npm run start:dev",
+    "start:notifications": "cd notifications-service && npm run start:dev",
+    "start:all": "concurrently \"npm run start:admin\" \"npm run start:auth\" \"npm run start:users\" \"npm run start:products\" \"npm run start:contacts\" \"npm run start:transactions\" \"npm run start:logistics\" \"npm run start:notifications\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "concurrently": "^9.1.2",
+    "ts-node": "^10.9.2"
+  }
+}

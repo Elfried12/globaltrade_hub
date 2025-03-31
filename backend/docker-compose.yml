@@ -1,0 +1,182 @@
+
+
+services:
+  # API Gateway
+  api-gateway:
+    build: ./backend/api-gateway
+    container_name: api_gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - users-service
+      - products-service
+      - contacts-service
+      - transactions-service
+      - logistics-service
+      - notifications-service
+      - admin-service
+    environment:
+      API_GATEWAY_PORT: 3000
+
+  # Auth Service
+  auth-service:
+    build: ./auth-service
+    container_name: auth_service
+    environment:
+      DATABASE_URL: "postgresql://dexter:Bt200A2elf#@auth-db:5432/authdb?schema=public"
+    depends_on:
+      - auth-db
+
+  auth-db:
+    image: postgres:13
+    container_name: auth_db
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: Bt200A2elf#
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+
+  # Users Service
+  users-service:
+    build: ./users-service
+    container_name: users_service
+    environment:
+      DATABASE_URL: "postgresql://dexter:Bt200A2elf#@users-db:5432/usersdb?schema=public"
+    depends_on:
+      - users-db
+
+  users-db:
+    image: postgres:13
+    container_name: users_db
+    environment:
+      POSTGRES_DB: usersdb
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: Bt200A2elf#
+    volumes:
+      - users-db-data:/var/lib/postgresql/data
+
+  # Products Service
+  products-service:
+    build: ./products-service
+    container_name: products_service
+    environment:
+      DATABASE_URL: "postgresql://dexter:Bt200A2elf#@products-db:5432/productsdb?schema=public"
+    depends_on:
+      - products-db
+
+  products-db:
+    image: postgres:13
+    container_name: products_db
+    environment:
+      POSTGRES_DB: productsdb
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: Bt200A2elf#
+    volumes:
+      - products-db-data:/var/lib/postgresql/data
+
+  # Contacts Service
+  contacts-service:
+    build: ./contacts-service
+    container_name: contacts_service
+    environment:
+      DATABASE_URL: "postgresql://dexter:Bt200A2elf#@contacts-db:5432/contactsdb?schema=public"
+    depends_on:
+      - contacts-db
+
+  contacts-db:
+    image: postgres:13
+    container_name: contacts_db
+    environment:
+      POSTGRES_DB: contactsdb
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: Bt200A2elf#
+    volumes:
+      - contacts-db-data:/var/lib/postgresql/data
+
+  # Transactions Service
+  transactions-service:
+    build: ./transactions-service
+    container_name: transactions_service
+    environment:
+      DATABASE_URL: "postgresql://dexter:Bt200A2elf#@transactions-db:5432/transactionsdb?schema=public"
+    depends_on:
+      - transactions-db
+
+  transactions-db:
+    image: postgres:13
+    container_name: transactions_db
+    environment:
+      POSTGRES_DB: transactionsdb
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: Bt200A2elf#
+    volumes:
+      - transactions-db-data:/var/lib/postgresql/data
+
+  # Logistics Service
+  logistics-service:
+    build: ./logistics-service
+    container_name: logistics_service
+    environment:
+      DATABASE_URL: "postgresql://dexter:Bt200A2elf#@logistics-db:5432/logisticsdb?schema=public"
+    depends_on:
+      - logistics-db
+
+  logistics-db:
+    image: postgres:13
+    container_name: logistics_db
+    environment:
+      POSTGRES_DB: logisticsdb
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: Bt200A2elf#
+    volumes:
+      - logistics-db-data:/var/lib/postgresql/data
+
+  # Notifications Service
+  notifications-service:
+    build: ./notifications-service
+    container_name: notifications_service
+    environment:
+      DATABASE_URL: "postgresql://dexter:Bt200A2elf#@notifications-db:5432/notificationsdb?schema=public"
+    depends_on:
+      - notifications-db
+
+  notifications-db:
+    image: postgres:13
+    container_name: notifications_db
+    environment:
+      POSTGRES_DB: notificationsdb
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: Bt200A2elf#
+    volumes:
+      - notifications-db-data:/var/lib/postgresql/data
+
+  # Admin Service
+  admin-service:
+    build: ./admin-service
+    container_name: admin_service
+    environment:
+      DATABASE_URL: "postgresql://dexter:Bt200A2elf#@admin-db:5432/admindb?schema=public"
+    depends_on:
+      - admin-db
+
+  admin-db:
+    image: postgres:13
+    container_name: admin_db
+    environment:
+      POSTGRES_DB: admindb
+      POSTGRES_USER: dexter
+      POSTGRES_PASSWORD: Bt200A2elf#
+    volumes:
+      - admin-db-data:/var/lib/postgresql/data
+
+volumes:
+  auth-db-data:
+  users-db-data:
+  products-db-data:
+  contacts-db-data:
+  transactions-db-data:
+  logistics-db-data:
+  notifications-db-data:
+  admin-db-data:
