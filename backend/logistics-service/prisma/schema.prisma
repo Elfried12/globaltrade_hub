@@ -12,3 +12,34 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model Vehicle {
+  id          Int   @id @default(uuid())
+  ownerId     Int
+  type        VehicleType
+  plateNumber String   @unique
+  brand       String
+  capacity    Int
+  status      VehicleStatus
+}
+
+model Reservation {
+  id         String   @id @default(uuid())
+  vehicleId  String
+  userId     String
+  price      Int   @default(0)
+  destination String
+  startDate  DateTime
+  endDate    DateTime
+  confirmed  Boolean  @default(false)
+}
+
+enum VehicleType {
+  TRICYCLE
+  CAMION
+}
+
+enum VehicleStatus {
+  DISPONIBLE
+  INDISPONIBLE
+}
+

@@ -11,6 +11,10 @@
     "start:contacts": "cd contacts-service && npm run start:dev",
     "start:transactions": "cd transactions-service && npm run start:dev",
     "start:logistics": "cd logistics-service && npm run start:dev",
+    "start:recommandations": "cd ai-recommendation-service && npm run start:dev",
+    "start:marketplace": "cd marketplace-service && npm run start:dev",
+    "start:payments": "cd payments-service && npm run start:dev",
+    "start:suppliers": "cd suppliers-service && npm run start:dev",
     "start:notifications": "cd notifications-service && npm run start:dev",
     "start:all": "concurrently \"npm run start:admin\" \"npm run start:auth\" \"npm run start:users\" \"npm run start:products\" \"npm run start:contacts\" \"npm run start:transactions\" \"npm run start:logistics\" \"npm run start:notifications\""
   },
@@ -19,8 +23,12 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/node": "^22.13.14",
     "concurrently": "^9.1.2",
     "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@nestjs/axios": "^4.0.0"
   }
 }

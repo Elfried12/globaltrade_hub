@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Payment {
+  id               String   @id @default(uuid())
+  userId           String   // ID de l'utilisateur
+  supplierId       String   // ID du fournisseur
+  transactionId    String   // Référence de la transaction liée
+  amount           Float
+  status           PaymentStatus
+  method           PaymentMethod
+  date             DateTime @default(now())
+  justification    String?  // Justificatif si le paiement est lié à une annulation
+  subscriptionType String?  // Premium, Basique, etc. (si applicable)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+enum PaymentStatus {
+  EN_ATTENTE
+  VALIDE
+  REJETE
+  ANNULE
+  REMBOURSE
+}
+
+enum PaymentMethod {
+  MOBILE_MONEY
+  CARTE_BANCAIRE
+  VIREMENT
+  PORTEFEUILLE_ELECTRONIQUE
+}

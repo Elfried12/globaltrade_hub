@@ -12,3 +12,36 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Transaction {
+  id                String   @id @default(uuid())
+  buyerId           Int
+  supplierId        Int
+  productId         String
+  quantity          Int
+  status            TransactionStatus
+  paymentConfirmed  Boolean
+  deliveryConfirmed Boolean
+  date_debut_transaction DateTime
+  date_fin_transaction   DateTime?
+  date_paiement          DateTime?
+  date_livraison         DateTime?
+  blockchainHash    String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+enum TransactionStatus {
+  PENDING
+  VALIDATED
+  COMPLETED
+  DELIVERED
+  PAYMENT_CONFIRMED
+  DELIVERY_CONFIRMED
+  PAYMENT_FAILED
+  DELIVERY_FAILED
+  FAILED
+  CANCELLED
+  
+}
+
