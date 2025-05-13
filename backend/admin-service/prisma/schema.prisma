@@ -12,3 +12,28 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Admin {
+  id       String   @id @default(uuid())
+  name     String
+  email    String   @unique
+  password String
+  role     String   @default("admin")
+}
+
+model Complaint {
+  id           String   @id @default(uuid())
+  userId       String
+  supplierId   String
+  transactionId String?
+  content      String
+  status       ComplaintStatus
+  createdAt    DateTime @default(now())
+}
+
+enum ComplaintStatus {
+  PENDING
+  RESOLVED
+  REJECTED
+}
+
