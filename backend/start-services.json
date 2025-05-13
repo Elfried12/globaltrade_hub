@@ -31,6 +31,22 @@
       {
         "name": "notifications-service",
         "path": "./notifications-service"
+      },
+      {
+        "name": "ai-recommandation-service",
+        "path": "./ai-recommandation-service"
+      },
+      {
+        "name": "marketplace-service",
+        "path": "./marketplace-service"
+      },
+      {
+        "name": "payments-service",
+        "path": "./payments-service"
+      },
+      {
+        "name": "suppliers-service",
+        "path": "./suppliers-service"
       }
     ]
   }

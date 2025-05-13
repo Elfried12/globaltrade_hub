@@ -12,3 +12,45 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model ContactThread {
+  id           String   @id @default(uuid())
+  userId       String
+  supplierId   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  isArchived   Boolean  @default(false)
+
+  messages     Message[]
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  threadId       String
+  senderId       String
+  senderRole     Role     // 'USER' ou 'SUPPLIER'
+  content        String?
+  attachmentUrl  String?  // Pour les fichiers ou images
+  sentAt         DateTime @default(now())
+  isRead         Boolean  @default(false)
+
+  thread         ContactThread @relation(fields: [threadId], references: [id])
+}
+
+model ContactRequest {
+  id          String   @id @default(uuid())
+  userId      String
+  supplierId  String
+  productId   String?
+  status      String   @default("pending") // pending, accepted, refused, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  respondedAt DateTime?
+
+  // Optionnel pour rattacher la demande à un produit
+}
+
+enum Role {
+  Acheteur
+  Fournisseur
+}
+

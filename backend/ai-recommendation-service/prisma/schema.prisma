@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Recommendation {
+  id              String      @id @default(uuid())
+  userId          String
+  recommendedItem String      // id du produit ou fournisseur recommandé
+  itemType        ItemType    // enum : PRODUCT ou SUPPLIER
+  reason          String      // exemple : "Basé sur vos précédents achats", "Filtrage collaboratif"
+  createdAt       DateTime    @default(now())
+}
+
+model UserPreference {
+  id         String   @id @default(uuid())
+  userId     String
+  key        String   // exemple : "categorie", "localisation", "prix_max"
+  value      String   // exemple : "Electronique", "Cotonou", "50000"
+  createdAt  DateTime @default(now())
+}
+
+model EvaluationHistorique {
+  id            String    @id @default(uuid())
+  userId        String
+  fournisseurId String
+  score         Float     // Score de satisfaction, ex : 4.5
+  commentaire   String?
+  createdAt     DateTime  @default(now())
+}
+
+enum ItemType {
+  PRODUCT
+  SUPPLIER
+}
