@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 class NotificationsModule extends Module {
   @override
-  List<ModularRoute> get routes => [
-    ChildRoute('/', child: (_, __) => Placeholder()),
-  ];
+  void routes(RouteManager r) {
+    r.child('/', child: (context) => const Placeholder());
+  }
 }

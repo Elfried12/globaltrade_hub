@@ -12,15 +12,16 @@ dependencies:
 
   # 🎨 UI/UX Modern & Composants stylés
   getwidget: ^4.0.0
-  flutter_neumorphic: ^3.2.0
   google_fonts: ^6.1.0
   tailwind_colors: ^0.3.1
-
   responsive_framework: ^1.1.1
   flutter_svg: ^2.0.7
   auto_size_text: ^3.0.0
-  lottie: ^2.7.0
+  lottie: ^3.3.1
   shimmer: ^3.0.0
+  simple_animations: ^5.0.2
+  carousel_slider: ^5.0.0
+  vector_math: ^2.1.4
 
   # 🧱 Architecture & gestion d’état propre
   flutter_modular: ^6.3.2
@@ -52,8 +53,10 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
+    - assets/images/gthint.png
     - assets/lottie/
+    - assets/images/grid_pattern.jpg  # Updated to .jpg
+    # Removed avatar1.png, avatar2.png, avatar3.png, and logo.png
 
   fonts:
     - family: Orbitron
