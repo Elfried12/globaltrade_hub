@@ -12,21 +12,23 @@ import 'modules/paiements/paiements_module.dart';
 import 'modules/produits/produits_module.dart';
 import 'modules/fournisseurs/fournisseurs_module.dart';
 import 'modules/transactions/transactions_module.dart';
+import 'modules/home/home_module.dart';
 
 class AppModule extends Module {
   @override
-  List<ModularRoute> get routes => [
-    ModuleRoute('/auth', module: AuthModule()),
-    ModuleRoute('/utilisateurs', module: UtilisateursModule()),
-    ModuleRoute('/contacts', module: ContactsModule()),
-    ModuleRoute('/douanes', module: DouanesModule()),
-    ModuleRoute('/evaluations', module: EvaluationsModule()),
-    ModuleRoute('/journal', module: JournalModule()),
-    ModuleRoute('/logistique', module: LogistiqueModule()),
-    ModuleRoute('/notifications', module: NotificationsModule()),
-    ModuleRoute('/paiements', module: PaiementsModule()),
-    ModuleRoute('/produits', module: ProduitsModule()),
-    ModuleRoute('/fournisseurs', module: FournisseursModule()),
-    ModuleRoute('/transactions', module: TransactionsModule()),
-  ];
+  void routes(RouteManager r) {
+    r.module('/auth', module: AuthModule());
+    r.module('/utilisateurs', module: UtilisateursModule());
+    r.module('/contacts', module: ContactsModule());
+    r.module('/douanes', module: DouanesModule());
+    r.module('/evaluations', module: EvaluationsModule());
+    r.module('/journal', module: JournalModule());
+    r.module('/logistique', module: LogistiqueModule());
+    r.module('/notifications', module: NotificationsModule());
+    r.module('/paiements', module: PaiementsModule());
+    r.module('/produits', module: ProduitsModule());
+    r.module('/fournisseurs', module: FournisseursModule());
+    r.module('/transactions', module: TransactionsModule());
+    r.module('/home', module: HomeModule());
+  }
 }
