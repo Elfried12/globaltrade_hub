@@ -13,8 +13,13 @@ import 'modules/produits/produits_module.dart';
 import 'modules/fournisseurs/fournisseurs_module.dart';
 import 'modules/transactions/transactions_module.dart';
 import 'modules/home/home_module.dart';
+import 'modules/splash/splash_module.dart';
+import 'modules/onboarding/onboarding_module.dart';
 
 class AppModule extends Module {
+  @override
+  void binds(Injector i) {}
+
   @override
   void routes(RouteManager r) {
     r.module('/auth', module: AuthModule());
@@ -30,5 +35,7 @@ class AppModule extends Module {
     r.module('/fournisseurs', module: FournisseursModule());
     r.module('/transactions', module: TransactionsModule());
     r.module('/home', module: HomeModule());
+    r.module('/splash', module: SplashModule());
+    r.module('/onboarding', module: OnboardingModule());
   }
 }

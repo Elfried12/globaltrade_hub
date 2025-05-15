@@ -3,8 +3,7 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'app_module.dart';
 
 void main() {
-  // ✅ Ajout de la route de démarrage
-  Modular.setInitialRoute('/auth');
+  Modular.setInitialRoute('/splash');
   runApp(ModularApp(module: AppModule(), child: const MyApp()));
 }
 
@@ -17,9 +16,10 @@ class MyApp extends StatelessWidget {
       title: 'GlobalTrade Hub',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Orbitron',
+        fontFamily: 'Montserrat',
         useMaterial3: true,
-        colorSchemeSeed: Colors.blueAccent,
+        colorSchemeSeed: const Color(0xFF6C63FF),
+        scaffoldBackgroundColor: const Color(0xFFF5F7FA),
       ),
       routerConfig: Modular.routerConfig,
     );

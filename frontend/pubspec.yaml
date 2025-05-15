@@ -64,6 +64,9 @@ flutter:
     - assets/images/materiaux.jpg
     - assets/images/congele.jpg
     - assets/lottie/
+    - assets/lottie/global_trade.json
+    - assets/lottie/products.json
+    - assets/lottie/secure.json
 
   fonts:
     - family: Orbitron

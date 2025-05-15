@@ -40,7 +40,7 @@ class _RegisterViewState extends State<RegisterView> {
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF6C63FF), Color(0xFF4834DF)],
+    colors: [Color(0xFF6C63FF), Color(0xFF00FFFF)],
   );
 
   // Shadows
