@@ -54,9 +54,16 @@ flutter:
 
   assets:
     - assets/images/gthint.png
+    - assets/images/hero_banner.jpg
+    - assets/images/about_illustration.jpg
+    - assets/images/grid_pattern.jpg
+    - assets/images/biscuits.png
+    - assets/images/frites.jpg
+    - assets/images/boissons.jpg
+    - assets/images/meubles.jpg
+    - assets/images/materiaux.jpg
+    - assets/images/congele.jpg
     - assets/lottie/
-    - assets/images/grid_pattern.jpg  # Updated to .jpg
-    # Removed avatar1.png, avatar2.png, avatar3.png, and logo.png
 
   fonts:
     - family: Orbitron

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
-import 'package:vector_math/vector_math.dart' as vector;
 
 class HomeStats extends StatefulWidget {
   const HomeStats({super.key});
@@ -11,203 +10,288 @@ class HomeStats extends StatefulWidget {
 }
 
 class _HomeStatsState extends State<HomeStats> with TickerProviderStateMixin {
+  late final List<AnimationController> _counterControllers;
   late final AnimationController _rotationController;
-  late final AnimationController _pulseController;
-  late final AnimationController _counterController;
-  final List<double> _currentValues = [0, 0, 0, 0];
-  final List<double> _targetValues = [10.5, 25, 98.7, 150];
+  late final AnimationController _slideController;
+
+  final List<StatData> stats = [
+    StatData(
+      title: 'Produits disponibles',
+      value: 15000,
+      suffix: '+',
+      icon: Icons.inventory_2,
+      gradient: const [Color(0xFF6C63FF), Color(0xFF4834DF)],
+    ),
+    StatData(
+      title: 'Fournisseurs vérifiés',
+      value: 500,
+      suffix: '+',
+      icon: Icons.verified_user,
+      gradient: const [Color(0xFF00FFFF), Color(0xFF6C63FF)],
+    ),
+    StatData(
+      title: 'Satisfaction client',
+      value: 98,
+      suffix: '%',
+      icon: Icons.thumb_up,
+      gradient: const [Color(0xFF4834DF), Color(0xFF00FFFF)],
+    ),
+    StatData(
+      title: 'Commandes livrées',
+      value: 25000,
+      suffix: '+',
+      icon: Icons.local_shipping,
+      gradient: const [Color(0xFF6C63FF), Color(0xFF00FFFF)],
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
+    _initializeControllers();
+  }
+
+  void _initializeControllers() {
+    _counterControllers = List.generate(
+      stats.length,
+      (index) => AnimationController(
+        duration: const Duration(milliseconds: 2000),
+        vsync: this,
+      ),
+    );
+
     _rotationController = AnimationController(
-      duration: const Duration(seconds: 10),
+      duration: const Duration(seconds: 20),
       vsync: this,
     )..repeat();
 
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 800),
       vsync: this,
-    )..repeat(reverse: true);
+    )..forward();
 
-    _counterController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    );
-
-    _counterController.addListener(() {
-      setState(() {
-        for (int i = 0; i < _currentValues.length; i++) {
-          _currentValues[i] = _targetValues[i] * _counterController.value;
+    for (var i = 0; i < _counterControllers.length; i++) {
+      Future.delayed(Duration(milliseconds: 200 * i), () {
+        if (mounted) {
+          _counterControllers[i].forward();
         }
       });
-    });
-
-    _counterController.forward();
+    }
   }
 
   @override
   void dispose() {
+    for (var controller in _counterControllers) {
+      controller.dispose();
+    }
     _rotationController.dispose();
-    _pulseController.dispose();
-    _counterController.dispose();
+    _slideController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 80),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A0F1E),
-        image: DecorationImage(
-          image: const AssetImage('assets/images/grid_pattern.png'),
-          fit: BoxFit.cover,
-          opacity: 0.05,
-          colorFilter: ColorFilter.mode(
-            const Color(0xFF6C63FF).withOpacity(0.3),
-            BlendMode.overlay,
-          ),
-        ),
-      ),
-      child: Column(
-        children: [
-          ShaderMask(
-            shaderCallback: (bounds) => const LinearGradient(
-              colors: [Color(0xFF6C63FF), Color(0xFF00FFFF)],
-            ).createShader(bounds),
-            child: Text(
-              'Impact Global',
-              style: GoogleFonts.orbitron(
-                fontSize: 42,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(height: 60),
-          Wrap(
-            spacing: 40,
-            runSpacing: 40,
-            alignment: WrapAlignment.center,
-            children: [
-              _buildFuturisticStatCard(
-                _currentValues[0].toStringAsFixed(1) + 'M',
-                'Produits Disponibles',
-                'inventory_2',
-                0,
-              ),
-              _buildFuturisticStatCard(
-                _currentValues[1].toStringAsFixed(0) + 'k',
-                'Fournisseurs Vérifiés',
-                'verified',
-                1,
-              ),
-              _buildFuturisticStatCard(
-                _currentValues[2].toStringAsFixed(1) + '%',
-                'Satisfaction Client',
-                'workspace_premium',
-                2,
-              ),
-              _buildFuturisticStatCard(
-                _currentValues[3].toStringAsFixed(0) + 'k',
-                'Commandes Livrées',
-                'rocket_launch',
-                3,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth > 800;
 
-  Widget _buildFuturisticStatCard(
-      String value, String label, String icon, int index) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_rotationController, _pulseController]),
-      builder: (context, child) {
         return Container(
-          width: 280,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1F2E),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: const Color(0xFF6C63FF).withOpacity(0.3),
-              width: 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF6C63FF)
-                    .withOpacity(0.2 * _pulseController.value),
-                blurRadius: 20,
-                spreadRadius: 5,
-              ),
-            ],
+          padding: EdgeInsets.symmetric(
+            horizontal: isDesktop ? 80.0 : 24.0,
+            vertical: 80.0,
           ),
-          child: Stack(
+          color: const Color(0xFFEDEFF5), // Slightly darker gray for contrast
+          child: Column(
             children: [
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: HexagonPainter(
-                    rotation: _rotationController.value * 2 * math.pi,
-                    color: const Color(0xFF6C63FF).withOpacity(0.1),
+              SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.2),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                  parent: _slideController,
+                  curve: Curves.easeOutCubic,
+                )),
+                child: FadeTransition(
+                  opacity: _slideController,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Notre Impact en Chiffres',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 42,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF6C63FF),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Des résultats concrets qui témoignent de notre expertise',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          color: const Color(0xFF6B7280),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6C63FF).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Icon(
-                      IconData(int.parse('e${index + 1}1c', radix: 16),
-                          fontFamily: 'MaterialIcons'),
-                      color: const Color(0xFF6C63FF),
-                      size: 32,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: [
-                        const Color(0xFF6C63FF),
-                        const Color(0xFF00FFFF),
-                        const Color(0xFF6C63FF),
-                      ],
-                      stops: const [0.0, 0.5, 1.0],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ).createShader(bounds),
-                    child: Text(
-                      value,
-                      style: GoogleFonts.orbitron(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+              const SizedBox(height: 60),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Wrap(
+                    spacing: 40,
+                    runSpacing: 40,
+                    alignment: WrapAlignment.center,
+                    children: List.generate(
+                      stats.length,
+                      (index) => _StatCard(
+                        data: stats[index],
+                        counterController: _counterControllers[index],
+                        rotationController: _rotationController,
+                        delay: Duration(milliseconds: 200 * index),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    label,
-                    style: GoogleFonts.spaceMono(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                  );
+                },
               ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _StatCard extends StatefulWidget {
+  final StatData data;
+  final AnimationController counterController;
+  final AnimationController rotationController;
+  final Duration delay;
+
+  const _StatCard({
+    required this.data,
+    required this.counterController,
+    required this.rotationController,
+    required this.delay,
+  });
+
+  @override
+  State<_StatCard> createState() => _StatCardState();
+}
+
+class _StatCardState extends State<_StatCard> with SingleTickerProviderStateMixin {
+  late Animation<double> _counterAnimation;
+  late AnimationController _hoverController;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _counterAnimation = Tween<double>(
+      begin: 0,
+      end: widget.data.value.toDouble(),
+    ).animate(CurvedAnimation(
+      parent: widget.counterController,
+      curve: Curves.easeOut,
+    ));
+
+    _hoverController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _hoverController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        _hoverController.forward();
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        _hoverController.reverse();
+      },
+      child: AnimatedBuilder(
+        animation: Listenable.merge([
+          widget.rotationController,
+          _hoverController,
+          widget.counterController,
+        ]),
+        builder: (context, child) {
+          return Transform.scale(
+            scale: 1.0 + (0.05 * _hoverController.value),
+            child: Container(
+              width: 280,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6C63FF).withOpacity(0.2 + (0.3 * _hoverController.value)),
+                    blurRadius: 15 + (15 * _hoverController.value),
+                    spreadRadius: 2 + (2 * _hoverController.value),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: HexagonPainter(
+                        rotation: widget.rotationController.value * 2 * math.pi,
+                        color: const Color(0xFF6C63FF).withOpacity(0.1),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        widget.data.icon,
+                        color: const Color(0xFF6C63FF),
+                        size: 48,
+                      ),
+                      const SizedBox(height: 24),
+                      AnimatedBuilder(
+                        animation: _counterAnimation,
+                        builder: (context, child) {
+                          return Text(
+                            '${_counterAnimation.value.round()}${widget.data.suffix}',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 42,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF2D3748),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        widget.data.title,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 18,
+                          color: const Color(0xFF6B7280),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -226,16 +310,15 @@ class HexagonPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) * 0.4;
+    final radius = math.min(size.width, size.height) / 2;
 
     final path = Path();
-    for (int i = 0; i < 6; i++) {
-      final angle = vector.radians(60.0 * i.toDouble() + rotation);
-      final point = center +
-          Offset(
-            radius * math.cos(angle),
-            radius * math.sin(angle),
-          );
+    for (var i = 0; i < 6; i++) {
+      final angle = rotation + (i * math.pi / 3);
+      final point = Offset(
+        center.dx + radius * math.cos(angle),
+        center.dy + radius * math.sin(angle),
+      );
       if (i == 0) {
         path.moveTo(point.dx, point.dy);
       } else {
@@ -249,4 +332,20 @@ class HexagonPainter extends CustomPainter {
   @override
   bool shouldRepaint(HexagonPainter oldDelegate) =>
       rotation != oldDelegate.rotation || color != oldDelegate.color;
+}
+
+class StatData {
+  final String title;
+  final int value;
+  final String suffix;
+  final IconData icon;
+  final List<Color> gradient;
+
+  StatData({
+    required this.title,
+    required this.value,
+    required this.suffix,
+    required this.icon,
+    required this.gradient,
+  });
 }
