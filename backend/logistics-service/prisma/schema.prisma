@@ -12,6 +12,18 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+model owner{
+  id        Int    @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  password  String
+  vehicles  Vehicle[]
+  reservations Reservation[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+  deletedAt DateTime?
+}
 model Vehicle {
   id          Int   @id @default(uuid())
   ownerId     Int
@@ -20,6 +32,10 @@ model Vehicle {
   brand       String
   capacity    Int
   status      VehicleStatus
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt()
+  deletedAt   DateTime?
+  
 }
 
 model Reservation {

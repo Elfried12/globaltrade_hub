@@ -47,6 +47,14 @@
       {
         "name": "suppliers-service",
         "path": "./suppliers-service"
+      },
+      {
+        "name": "evaluations-service",
+        "path": "./evaluations-service"
+      },
+      {
+        "name": "douane-service",
+        "path": "./douane-service"
       }
     ]
   }

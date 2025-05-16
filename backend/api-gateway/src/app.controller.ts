@@ -1,13 +1,13 @@
 // app.controller.ts
 import { Controller, All, Req, Res, Param, Body, Query } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ProxyService } from './proxy/proxy.service';
+import { ProxyService } from '../proxy/proxy.service';
 
-@Controller(':service')
+@Controller('api/:service')
 export class AppController {
   constructor(private readonly proxyService: ProxyService) {}
 
-  @All('*')
+  @All('*path')
   async handleAll(
     @Param('service') service: string,
     @Req() req: Request,
