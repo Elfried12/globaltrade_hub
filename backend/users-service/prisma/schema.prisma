@@ -16,7 +16,7 @@ model Profile {
   id               String   @id @default(uuid())
   userId           String   @unique
   name             String
-  phoneNumber      String
+  telephone      String
   address          String
   identityDocument String
   residenceProof   String

@@ -20,8 +20,9 @@ model Supplier {
   name             String   
   address          String
   companyName      String?
+  companyNumber     String?
   legalDocs        String   // JSON (registre, attestation, etc.)
-  verified         Boolean  @default(false)
+  isverified         Boolean  @default(false)
   premium          Boolean  @default(false)
   verificationDate DateTime?
   products         Product[]
