@@ -25,7 +25,33 @@ model Supplier {
   isverified         Boolean  @default(false)
   premium          Boolean  @default(false)
   verificationDate DateTime?
-  products         Product[]
+  products    Product[]    @relation("SupplierProducts")        
+  evaluations Evaluation[]
   user             User     @relation(fields: [userId], references: [id])
+}
+
+model Product {
+  id          String     @id @default(uuid())
+  name        String
+  supplier    Supplier   @relation("SupplierProducts", fields: [supplierId], references: [id])
+  supplierId  String
+  category     String
+  unitPrice    Float
+  quantity     Int
+  description  String?
+  weight       Float?
+  dimensions   String?
+  minQuantity  Int
+  availability Boolean
+  imageUrl     String?
+  createdAt    DateTime @default(now())
+}
+
+model Evaluation {
+  id          String   @id @default(uuid())
+  rating      Int
+  comment     String?
+  supplier    Supplier @relation(fields: [supplierId], references: [id])
+  supplierId  String
 }
 

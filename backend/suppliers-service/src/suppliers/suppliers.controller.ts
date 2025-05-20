@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Param, Patch, Delete} from '@nestjs/common';
+import {Controller, Get, Post, Body, Param, Patch, Delete,Query} from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { Request } from 'express';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
@@ -6,6 +6,7 @@ import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { CreateResponseDto } from './dto/respond-request.dto';
 import { ValidateTransactionDto } from './dto/validate-transaction.dto';
 import { CancelTransactionDto } from './dto/cancel-transaction.dto';
+import { SearchSuppliersDto } from './dto/search-suppliers.dto';
 
 @Controller('suppliers/:supplierId')
 export class SuppliersController {
@@ -80,11 +81,12 @@ export class SuppliersController {
   }
 
   @Get()
-  findAll() {
-    return this.suppliersService.findAll();
+  search(@Query() filters: SearchSuppliersDto) {
+    return this.suppliersService.findAll(filters);
   }
 
-  @Get(':id')
+
+   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.suppliersService.findOne(id);
   }
@@ -99,3 +101,7 @@ export class SuppliersController {
     return this.suppliersService.remove(id);
   }
 }
+
+/*function Query(): (target: SuppliersController, propertyKey: "search", parameterIndex: 0) => void {
+  throw new Error('Function not implemented.');
+}*/

@@ -8,6 +8,7 @@ import { ValidateTransactionDto } from './dto/validate-transaction.dto';
 import { CancelTransactionDto } from './dto/cancel-transaction.dto';
 import { CreateSupplierDto } from './dto/create-supplier.dto';
 import { UpdateSupplierDto } from './dto/update-supplier.dto';
+import { SearchSuppliersDto } from './dto/search-suppliers.dto';
 
 @Injectable()
 export class SuppliersService {
@@ -124,14 +125,43 @@ export class SuppliersService {
     }
   }
 
-  async findAll(): Promise<Supplier[]> {
-    return this.prisma.supplier.findMany();
+   async findAll(filters: SearchSuppliersDto) {
+    const where: any = {};
+
+    if (filters.name) {
+      where.name = { contains: filters.name, mode: 'insensitive' };
+    }
+    if (filters.location) {
+      where.location = { contains: filters.location, mode: 'insensitive' };
+    }
+    if (filters.verified !== undefined) {
+      where.isVerified = filters.verified;
+    }
+    if (filters.premium !== undefined) {
+      where.isPremium = filters.premium;
+    }
+    if (filters.category) {
+      // on ne stocke pas la catégorie sur le supplier directement
+      // on filtre via la relation produits
+      where.products = {
+        some: { category: { equals: filters.category, mode: 'insensitive' } },
+      };
+    }
+
+    return this.prisma.supplier.findMany({
+      where,
+      include: {
+        products: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
-  async findOne(id: string): Promise<Supplier> {
-    const supplier = await this.prisma.supplier.findUnique({ where: { id } });
-    if (!supplier) throw new NotFoundException('Fournisseur non trouvé');
-    return supplier;
+  async findOne(id: string) {
+    return this.prisma.supplier.findUnique({
+      where: { id },
+      include: { products: true, evaluations: true },
+    });
   }
 
   async update(id: string, dto: UpdateSupplierDto): Promise<Supplier> {
