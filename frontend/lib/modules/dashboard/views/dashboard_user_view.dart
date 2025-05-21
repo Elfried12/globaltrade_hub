@@ -15,7 +15,7 @@ import 'package:frontend/modules/dashboard/views/messaging_screen.dart';
 import 'package:frontend/modules/dashboard/views/favorites_screen.dart';
 import 'package:frontend/modules/dashboard/views/documents_screen.dart';
 import 'package:frontend/modules/dashboard/views/profile_screen.dart';
-import 'package:flutter/rendering.dart'; // Added this import
+import 'package:flutter/rendering.dart';
 
 class DashboardUserView extends StatefulWidget {
   const DashboardUserView({super.key});
@@ -1247,4 +1247,4 @@ class _DashboardUserViewState extends State<DashboardUserView> {
       ),
     );
   }
-} 
+}

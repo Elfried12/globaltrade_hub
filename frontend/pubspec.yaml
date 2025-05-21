@@ -22,6 +22,7 @@ dependencies:
   simple_animations: ^5.0.2
   carousel_slider: ^5.0.0
   vector_math: ^2.1.4
+  percent_indicator: ^4.2.3  # Ajouté pour CircularPercentIndicator
 
   # 🧱 Architecture & gestion d’état propre
   flutter_modular: ^6.3.2
