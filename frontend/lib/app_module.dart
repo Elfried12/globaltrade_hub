@@ -15,6 +15,7 @@ import 'modules/transactions/transactions_module.dart';
 import 'modules/home/home_module.dart';
 import 'modules/splash/splash_module.dart';
 import 'modules/onboarding/onboarding_module.dart';
+import 'modules/dashboard/dashboard_module.dart'; // Ajouté
 
 class AppModule extends Module {
   @override
@@ -37,5 +38,6 @@ class AppModule extends Module {
     r.module('/home', module: HomeModule());
     r.module('/splash', module: SplashModule());
     r.module('/onboarding', module: OnboardingModule());
+    r.module('/dashboard', module: DashboardModule()); // Ajouté
   }
 }
