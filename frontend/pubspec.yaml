@@ -31,12 +31,12 @@ dependencies:
   provider: ^6.1.2
 
   # 📊 Visualisation
-  syncfusion_flutter_charts: ^23.1.36
+  syncfusion_flutter_charts: 29.2.5
 
   # 🌍 Internationalisation
   flutter_localizations:
     sdk: flutter
-  intl: ^0.18.0  # Downgraded to match syncfusion_flutter_charts requirement
+  intl: ^0.20.2  # Downgraded to match syncfusion_flutter_charts requirement
 
   # 🔒 Accessibilité et sécurité UX
   flutter_secure_storage: ^9.0.0

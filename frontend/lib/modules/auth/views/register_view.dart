@@ -581,6 +581,33 @@ class _RegisterViewState extends State<RegisterView> {
                     ],
                   ),
                 ),
+                DropdownMenuItem(
+                  value: 'propriétaire',
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: secondaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.local_shipping,
+                          color: const Color.fromARGB(255, 204, 20, 29),
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Propriétaire',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 15,
+                          color: textPrimaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
               onChanged: (val) => setState(() => _selectedRole = val!),
               decoration: InputDecoration(
