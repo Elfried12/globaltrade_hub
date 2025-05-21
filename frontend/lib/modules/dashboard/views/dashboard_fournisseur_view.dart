@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/rendering.dart'; // Added this import
+import 'package:flutter/rendering.dart';
 
 class Product {
   String name;
@@ -465,19 +465,19 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
     });
     switch (index) {
       case 0:
-        Modular.to.navigate('/dashboard/');
+        Modular.to.navigate('/dashboard/fournisseur/');
         break;
       case 1:
-        Modular.to.navigate('/dashboard/products/');
+        Modular.to.navigate('/dashboard/fournisseur/offers/');
         break;
       case 2:
-        Modular.to.navigate('/dashboard/orders/');
+        Modular.to.navigate('/dashboard/fournisseur/orders/');
         break;
       case 3:
-        Modular.to.navigate('/notifications/');
+        Modular.to.navigate('/dashboard/fournisseur/notifications/');
         break;
       case 4:
-        Modular.to.navigate('/dashboard/profile/');
+        Modular.to.navigate('/dashboard/fournisseur/profile/');
         break;
     }
   }
@@ -657,20 +657,39 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             decoration: const BoxDecoration(
               color: Color(0xFF1E88E5),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
-                Image.asset(
-                  'assets/images/gthint.png',
-                  height: 32,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      'assets/images/gthint.png',
+                      height: 32,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'GlobalTrade Hub',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'GlobalTrade Hub',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    onPressed: () {
+                      _scaffoldKey.currentState?.closeDrawer();
+                    },
+                    tooltip: 'Fermer',
                   ),
                 ),
               ],
@@ -680,7 +699,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.dashboard_outlined,
             title: 'Tableau de bord',
             onTap: () {
-              Modular.to.navigate('/dashboard/');
+              Modular.to.navigate('/dashboard/fournisseur/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -689,7 +708,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.inventory_2_outlined,
             title: 'Mes produits',
             onTap: () {
-              Modular.to.navigate('/dashboard/products/');
+              Modular.to.navigate('/dashboard/fournisseur/offers/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -698,7 +717,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.shopping_cart_outlined,
             title: 'Commandes',
             onTap: () {
-              Modular.to.navigate('/dashboard/orders/');
+              Modular.to.navigate('/dashboard/fournisseur/orders/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -707,7 +726,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.handshake_outlined,
             title: 'Négociations',
             onTap: () {
-              Modular.to.navigate('/dashboard/negotiations/');
+              Modular.to.navigate('/dashboard/fournisseur/negotiations/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -716,7 +735,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.storefront_outlined,
             title: 'Catalogue & Stock',
             onTap: () {
-              Modular.to.navigate('/dashboard/stock/');
+              Modular.to.navigate('/dashboard/fournisseur/offers-overview/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -725,7 +744,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.report_problem_outlined,
             title: 'Réclamations',
             onTap: () {
-              Modular.to.navigate('/dashboard/complaints/');
+              Modular.to.navigate('/dashboard/fournisseur/reviews/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -734,7 +753,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.local_shipping_outlined,
             title: 'Logistique',
             onTap: () {
-              Modular.to.navigate('/logistique/');
+              Modular.to.navigate('/dashboard/fournisseur/logistics/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -743,7 +762,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.description_outlined,
             title: 'Documents légaux',
             onTap: () {
-              Modular.to.navigate('/dashboard/documents/');
+              Modular.to.navigate('/dashboard/fournisseur/documents/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -752,7 +771,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.bar_chart_outlined,
             title: 'Statistiques',
             onTap: () {
-              Modular.to.navigate('/dashboard/stats/');
+              Modular.to.navigate('/dashboard/fournisseur/transactions-overview/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -761,7 +780,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.star_border_outlined,
             title: 'Abonnement Premium',
             onTap: () {
-              Modular.to.navigate('/dashboard/premium/');
+              Modular.to.navigate('/dashboard/fournisseur/premium/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -770,7 +789,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.message_outlined,
             title: 'Messagerie',
             onTap: () {
-              Modular.to.navigate('/dashboard/messaging/');
+              Modular.to.navigate('/dashboard/fournisseur/messaging/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -779,7 +798,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.favorite_border,
             title: 'Favoris acheteurs',
             onTap: () {
-              Modular.to.navigate('/dashboard/favorites/');
+              Modular.to.navigate('/dashboard/fournisseur/favorites/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -788,7 +807,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.security_outlined,
             title: 'Blockchain Trace',
             onTap: () {
-              Modular.to.navigate('/dashboard/blockchain/');
+              Modular.to.navigate('/dashboard/fournisseur/transactions-overview/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -797,7 +816,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.support_agent_outlined,
             title: 'Support & Aide',
             onTap: () {
-              Modular.to.navigate('/dashboard/support/');
+              Modular.to.navigate('/dashboard/fournisseur/reviews/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -806,7 +825,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             icon: Icons.settings_outlined,
             title: 'Paramètres',
             onTap: () {
-              Modular.to.navigate('/dashboard/profile/');
+              Modular.to.navigate('/dashboard/fournisseur/profile/');
               _scaffoldKey.currentState?.closeDrawer();
             },
             isExpanded: true,
@@ -844,7 +863,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.dashboard_outlined,
                   title: 'Tableau de bord',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/');
+                    Modular.to.navigate('/dashboard/fournisseur/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -852,7 +871,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.inventory_2_outlined,
                   title: 'Mes produits',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/products/');
+                    Modular.to.navigate('/dashboard/fournisseur/offers/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -860,7 +879,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.shopping_cart_outlined,
                   title: 'Commandes',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/orders/');
+                    Modular.to.navigate('/dashboard/fournisseur/orders/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -868,7 +887,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.handshake_outlined,
                   title: 'Négociations',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/negotiations/');
+                    Modular.to.navigate('/dashboard/fournisseur/negotiations/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -876,7 +895,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.storefront_outlined,
                   title: 'Catalogue & Stock',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/stock/');
+                    Modular.to.navigate('/dashboard/fournisseur/offers-overview/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -884,7 +903,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.report_problem_outlined,
                   title: 'Réclamations',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/complaints/');
+                    Modular.to.navigate('/dashboard/fournisseur/reviews/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -892,7 +911,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.local_shipping_outlined,
                   title: 'Logistique',
                   onTap: () {
-                    Modular.to.navigate('/logistique/');
+                    Modular.to.navigate('/dashboard/fournisseur/logistics/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -900,7 +919,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.description_outlined,
                   title: 'Documents légaux',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/documents/');
+                    Modular.to.navigate('/dashboard/fournisseur/documents/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -908,7 +927,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.bar_chart_outlined,
                   title: 'Statistiques',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/stats/');
+                    Modular.to.navigate('/dashboard/fournisseur/transactions-overview/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -916,7 +935,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.star_border_outlined,
                   title: 'Abonnement Premium',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/premium/');
+                    Modular.to.navigate('/dashboard/fournisseur/premium/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -924,7 +943,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.message_outlined,
                   title: 'Messagerie',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/messaging/');
+                    Modular.to.navigate('/dashboard/fournisseur/messaging/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -932,7 +951,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.favorite_border,
                   title: 'Favoris acheteurs',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/favorites/');
+                    Modular.to.navigate('/dashboard/fournisseur/favorites/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -940,7 +959,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.security_outlined,
                   title: 'Blockchain Trace',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/blockchain/');
+                    Modular.to.navigate('/dashboard/fournisseur/transactions-overview/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -948,7 +967,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.support_agent_outlined,
                   title: 'Support & Aide',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/support/');
+                    Modular.to.navigate('/dashboard/fournisseur/reviews/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -956,7 +975,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   icon: Icons.settings_outlined,
                   title: 'Paramètres',
                   onTap: () {
-                    Modular.to.navigate('/dashboard/profile/');
+                    Modular.to.navigate('/dashboard/fournisseur/profile/');
                   },
                   isExpanded: _isSidebarExpanded,
                 ),
@@ -1028,7 +1047,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             ),
           GestureDetector(
             onTap: () {
-              Modular.to.navigate('/dashboard/');
+              Modular.to.navigate('/dashboard/fournisseur/');
             },
             child: Image.asset(
               'assets/images/gthint.png',
@@ -1087,7 +1106,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                   size: 20,
                 ),
                 onPressed: () {
-                  Modular.to.navigate('/notifications/');
+                  Modular.to.navigate('/dashboard/fournisseur/notifications/');
                 },
                 tooltip: 'Notifications',
                 constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
@@ -1120,9 +1139,9 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
               if (value == 'logout') {
                 Modular.to.navigate('/auth');
               } else if (value == 'profile') {
-                Modular.to.navigate('/dashboard/profile/');
+                Modular.to.navigate('/dashboard/fournisseur/profile/');
               } else if (value == 'settings') {
-                Modular.to.navigate('/dashboard/profile/');
+                Modular.to.navigate('/dashboard/fournisseur/profile/');
               }
             },
             itemBuilder: (context) => [
@@ -1197,7 +1216,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                 Text(
                   'Bienvenue, Fournisseur !',
                   style: GoogleFonts.inter(
-                    fontSize: 18,
+                    fontSize: isSmallScreen ? 16 : 18,
                     fontWeight: FontWeight.w600,
                     color: _isDarkMode ? Colors.white : const Color(0xFF212121),
                   ),
@@ -1207,7 +1226,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
                 Text(
                   'Gérez vos produits.',
                   style: GoogleFonts.inter(
-                    fontSize: 12,
+                    fontSize: isSmallScreen ? 10 : 12,
                     color: _isDarkMode ? Colors.grey[400] : const Color(0xFF757575),
                   ),
                 ),
@@ -1226,85 +1245,148 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         Text(
           'Aperçu des performances',
           style: GoogleFonts.inter(
-            fontSize: isSmallScreen ? 18 : 20,
+            fontSize: isSmallScreen ? 16 : 20,
             fontWeight: FontWeight.w600,
             color: _isDarkMode ? Colors.white : const Color(0xFF212121),
           ),
         ),
         const SizedBox(height: 8),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(), // Fixed syntax
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: isSmallScreen ? 320 : isMobile ? 300 : 250,
-            childAspectRatio: isMobile ? 3 : 1.5,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-          ),
-          itemCount: 8,
-          itemBuilder: (context, index) {
-            switch (index) {
-              case 0:
-                return _buildKpiCard(
-                  title: 'Produits actifs',
-                  value: '45',
-                  subTitle: '10 en attente',
-                  icon: Icons.inventory_2_outlined,
-                );
-              case 1:
-                return _buildKpiCard(
-                  title: 'Stock disponible',
-                  value: '1200 unités',
-                  subTitle: '3 produits bas',
-                  icon: Icons.storefront_outlined,
-                );
-              case 2:
-                return _buildKpiCard(
-                  title: 'Commandes en attente',
-                  value: '8',
-                  subTitle: '2 urgentes',
-                  icon: Icons.shopping_cart_outlined,
-                );
-              case 3:
-                return _buildKpiCard(
-                  title: 'Ventes réalisées',
-                  value: '150',
-                  subTitle: '5M FCFA',
-                  icon: Icons.check_circle_outline,
-                );
-              case 4:
-                return _buildKpiCard(
-                  title: 'Revenus ce mois',
-                  value: '2M FCFA',
-                  subTitle: '+15% vs mois dernier',
-                  icon: Icons.monetization_on_outlined,
-                );
-              case 5:
-                return _buildKpiCard(
-                  title: 'Délai moyen livraison',
-                  value: '3 jours',
-                  subTitle: 'Stable',
-                  icon: Icons.local_shipping_outlined,
-                );
-              case 6:
-                return _buildKpiCard(
-                  title: 'Négociations ouvertes',
-                  value: '5',
-                  subTitle: '3 en attente',
-                  icon: Icons.handshake_outlined,
-                );
-              case 7:
-                return _buildKpiCard(
-                  title: 'Réclamations en cours',
-                  value: '2',
-                  subTitle: '1 urgente',
-                  icon: Icons.report_problem_outlined,
-                );
-              default:
-                return const SizedBox.shrink();
-            }
-          },
-        ),
+        isMobile
+            ? SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildKpiCard(
+                      title: 'Produits actifs',
+                      value: '45',
+                      subTitle: '10 en attente',
+                      icon: Icons.inventory_2_outlined,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildKpiCard(
+                      title: 'Stock disponible',
+                      value: '1200 unités',
+                      subTitle: '3 produits bas',
+                      icon: Icons.storefront_outlined,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildKpiCard(
+                      title: 'Commandes en attente',
+                      value: '8',
+                      subTitle: '2 urgentes',
+                      icon: Icons.shopping_cart_outlined,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildKpiCard(
+                      title: 'Ventes réalisées',
+                      value: '150',
+                      subTitle: '5M FCFA',
+                      icon: Icons.check_circle_outline,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildKpiCard(
+                      title: 'Revenus ce mois',
+                      value: '2M FCFA',
+                      subTitle: '+15% vs mois dernier',
+                      icon: Icons.monetization_on_outlined,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildKpiCard(
+                      title: 'Délai moyen livraison',
+                      value: '3 jours',
+                      subTitle: 'Stable',
+                      icon: Icons.local_shipping_outlined,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildKpiCard(
+                      title: 'Négociations ouvertes',
+                      value: '5',
+                      subTitle: '3 en attente',
+                      icon: Icons.handshake_outlined,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildKpiCard(
+                      title: 'Réclamations en cours',
+                      value: '2',
+                      subTitle: '1 urgente',
+                      icon: Icons.report_problem_outlined,
+                    ),
+                  ],
+                ),
+              )
+            : GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: isTablet ? 300 : 250,
+                  childAspectRatio: 1.5,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: 8,
+                itemBuilder: (context, index) {
+                  switch (index) {
+                    case 0:
+                      return _buildKpiCard(
+                        title: 'Produits actifs',
+                        value: '45',
+                        subTitle: '10 en attente',
+                        icon: Icons.inventory_2_outlined,
+                      );
+                    case 1:
+                      return _buildKpiCard(
+                        title: 'Stock disponible',
+                        value: '1200 unités',
+                        subTitle: '3 produits bas',
+                        icon: Icons.storefront_outlined,
+                      );
+                    case 2:
+                      return _buildKpiCard(
+                        title: 'Commandes en attente',
+                        value: '8',
+                        subTitle: '2 urgentes',
+                        icon: Icons.shopping_cart_outlined,
+                      );
+                    case 3:
+                      return _buildKpiCard(
+                        title: 'Ventes réalisées',
+                        value: '150',
+                        subTitle: '5M FCFA',
+                        icon: Icons.check_circle_outline,
+                      );
+                    case 4:
+                      return _buildKpiCard(
+                        title: 'Revenus ce mois',
+                        value: '2M FCFA',
+                        subTitle: '+15% vs mois dernier',
+                        icon: Icons.monetization_on_outlined,
+                      );
+                    case 5:
+                      return _buildKpiCard(
+                        title: 'Délai moyen livraison',
+                        value: '3 jours',
+                        subTitle: 'Stable',
+                        icon: Icons.local_shipping_outlined,
+                      );
+                    case 6:
+                      return _buildKpiCard(
+                        title: 'Négociations ouvertes',
+                        value: '5',
+                        subTitle: '3 en attente',
+                        icon: Icons.handshake_outlined,
+                      );
+                    case 7:
+                      return _buildKpiCard(
+                        title: 'Réclamations en cours',
+                        value: '2',
+                        subTitle: '1 urgente',
+                        icon: Icons.report_problem_outlined,
+                      );
+                    default:
+                      return const SizedBox.shrink();
+                  }
+                },
+              ),
       ],
     );
   }
@@ -1317,6 +1399,8 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
   }) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
+      width: isMobile ? 150 : 250, // Largeur ajustée pour mobile
+      height: isMobile ? 100 : 120, // Hauteur réduite sur mobile
       decoration: BoxDecoration(
         color: _isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -1328,60 +1412,52 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () {},
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
+      child: Padding(
+        padding: EdgeInsets.all(isMobile ? 6 : 8), // Padding réduit sur mobile
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
               children: [
-                const CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xFF1E88E5),
-                  child: Icon(Icons.inventory_2, color: Colors.white, size: 14),
+                CircleAvatar(
+                  radius: isMobile ? 12 : 14,
+                  backgroundColor: const Color(0xFF1E88E5),
+                  child: Icon(icon, color: Colors.white, size: isMobile ? 12 : 14),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: _isDarkMode ? Colors.grey[400] : const Color(0xFF757575),
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        value,
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: _isDarkMode ? Colors.white : const Color(0xFF212121),
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (!isMobile)
-                        const SizedBox(height: 2),
-                      if (!isMobile)
-                        Text(
-                          subTitle,
-                          style: GoogleFonts.inter(
-                            fontSize: 10,
-                            color: _isDarkMode ? Colors.grey[400] : const Color(0xFF757575),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                    ],
+                  child: Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: isMobile ? 10 : 12,
+                      color: _isDarkMode ? Colors.grey[400] : const Color(0xFF757575),
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: GoogleFonts.inter(
+                fontSize: isMobile ? 12 : 14,
+                fontWeight: FontWeight.w600,
+                color: _isDarkMode ? Colors.white : const Color(0xFF212121),
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subTitle,
+              style: GoogleFonts.inter(
+                fontSize: isMobile ? 8 : 10,
+                color: _isDarkMode ? Colors.grey[400] : const Color(0xFF757575),
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );
@@ -1394,7 +1470,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         Text(
           'Mes produits récents',
           style: GoogleFonts.inter(
-            fontSize: isSmallScreen ? 18 : 20,
+            fontSize: isSmallScreen ? 16 : 20,
             fontWeight: FontWeight.w600,
             color: _isDarkMode ? Colors.white : const Color(0xFF212121),
           ),
@@ -1441,16 +1517,16 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        leading: const CircleAvatar(
-          radius: 14,
-          backgroundColor: Color(0xFF1E88E5),
-          child: Icon(Icons.inventory_2, color: Colors.white, size: 14),
+        contentPadding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8, vertical: isMobile ? 2 : 4),
+        leading: CircleAvatar(
+          radius: isMobile ? 12 : 14,
+          backgroundColor: const Color(0xFF1E88E5),
+          child: const Icon(Icons.inventory_2, color: Colors.white, size: 14),
         ),
         title: Text(
           name,
           style: GoogleFonts.inter(
-            fontSize: 14,
+            fontSize: isMobile ? 12 : 14,
             fontWeight: FontWeight.w600,
             color: _isDarkMode ? Colors.white : const Color(0xFF212121),
           ),
@@ -1459,7 +1535,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         subtitle: Text(
           price,
           style: GoogleFonts.inter(
-            fontSize: 12,
+            fontSize: isMobile ? 10 : 12,
             color: _isDarkMode ? Colors.grey[400] : const Color(0xFF757575),
           ),
           overflow: TextOverflow.ellipsis,
@@ -1470,7 +1546,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
             Text(
               status,
               style: GoogleFonts.inter(
-                fontSize: 10,
+                fontSize: isMobile ? 8 : 10,
                 fontWeight: FontWeight.w600,
                 color: status == 'Actif' ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
               ),
@@ -1507,7 +1583,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
           ],
         ),
         onTap: () {
-          Modular.to.navigate('/dashboard/products/');
+          Modular.to.navigate('/dashboard/fournisseur/offers/');
         },
       ),
     );
@@ -1520,7 +1596,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         Text(
           'Commandes récentes',
           style: GoogleFonts.inter(
-            fontSize: isSmallScreen ? 18 : 20,
+            fontSize: isSmallScreen ? 16 : 20,
             fontWeight: FontWeight.w600,
             color: _isDarkMode ? Colors.white : const Color(0xFF212121),
           ),
@@ -1566,16 +1642,16 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        leading: const CircleAvatar(
-          radius: 14,
-          backgroundColor: Color(0xFF1E88E5),
-          child: Icon(Icons.shopping_cart, color: Colors.white, size: 14),
+        contentPadding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8, vertical: isMobile ? 2 : 4),
+        leading: CircleAvatar(
+          radius: isMobile ? 12 : 14,
+          backgroundColor: const Color(0xFF1E88E5),
+          child: const Icon(Icons.shopping_cart, color: Colors.white, size: 14),
         ),
         title: Text(
           buyer,
           style: GoogleFonts.inter(
-            fontSize: 14,
+            fontSize: isMobile ? 12 : 14,
             fontWeight: FontWeight.w600,
             color: _isDarkMode ? Colors.white : const Color(0xFF212121),
           ),
@@ -1584,7 +1660,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         subtitle: Text(
           amount,
           style: GoogleFonts.inter(
-            fontSize: 12,
+            fontSize: isMobile ? 10 : 12,
             color: _isDarkMode ? Colors.grey[400] : const Color(0xFF757575),
           ),
           overflow: TextOverflow.ellipsis,
@@ -1592,13 +1668,13 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         trailing: Text(
           status,
           style: GoogleFonts.inter(
-            fontSize: 10,
+            fontSize: isMobile ? 8 : 10,
             fontWeight: FontWeight.w600,
             color: status == 'Payé' ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
           ),
         ),
         onTap: () {
-          Modular.to.navigate('/dashboard/orders/');
+          Modular.to.navigate('/dashboard/fournisseur/orders/');
         },
       ),
     );
@@ -1611,7 +1687,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         Text(
           'Négociations récentes',
           style: GoogleFonts.inter(
-            fontSize: isSmallScreen ? 18 : 20,
+            fontSize: isSmallScreen ? 16 : 20,
             fontWeight: FontWeight.w600,
             color: _isDarkMode ? Colors.white : const Color(0xFF212121),
           ),
@@ -1657,15 +1733,15 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        contentPadding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8, vertical: isMobile ? 2 : 4),
         leading: CircularPercentIndicator(
-          radius: 14,
+          radius: isMobile ? 12 : 14,
           lineWidth: 3,
           percent: progress,
           center: Text(
             '${(progress * 100).toInt()}%',
             style: GoogleFonts.inter(
-              fontSize: 10,
+              fontSize: isMobile ? 8 : 10,
               color: _isDarkMode ? Colors.white : const Color(0xFF212121),
             ),
           ),
@@ -1675,7 +1751,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         title: Text(
           buyer,
           style: GoogleFonts.inter(
-            fontSize: 14,
+            fontSize: isMobile ? 12 : 14,
             fontWeight: FontWeight.w600,
             color: _isDarkMode ? Colors.white : const Color(0xFF212121),
           ),
@@ -1684,7 +1760,7 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         subtitle: Text(
           amount,
           style: GoogleFonts.inter(
-            fontSize: 12,
+            fontSize: isMobile ? 10 : 12,
             color: _isDarkMode ? Colors.grey[400] : const Color(0xFF757575),
           ),
           overflow: TextOverflow.ellipsis,
@@ -1692,13 +1768,13 @@ class _DashboardFournisseurViewState extends State<DashboardFournisseurView> {
         trailing: Text(
           status,
           style: GoogleFonts.inter(
-            fontSize: 10,
+            fontSize: isMobile ? 8 : 10,
             fontWeight: FontWeight.w600,
             color: status == 'En cours' ? const Color(0xFFE53935) : const Color(0xFF4CAF50),
           ),
         ),
         onTap: () {
-          Modular.to.navigate('/dashboard/negotiations/');
+          Modular.to.navigate('/dashboard/fournisseur/negotiations/');
         },
       ),
     );
