@@ -25,8 +25,16 @@ model Product {
   dimensions   String?
   minQuantity  Int
   availability Boolean
-  imageUrl     String?
-  createdAt    DateTime @default(now())
+  images      Image[]
   supplier     Supplier @relation(fields: [supplierId], references: [id])
+  createdAt    DateTime @default(now())
+  
+}
+
+model Image {
+  id        String  @id @default(uuid())
+  url       String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
 }
 
