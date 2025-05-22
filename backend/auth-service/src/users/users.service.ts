@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService }                 from 'prisma/prisma.service';
-import { User, Role }                    from '@prisma/client';
-import { CreateUserDto }                 from './dto/create-user.dto';
-import { UpdateUserDto }                 from './dto/update-user.dto';
+// src/users/users.service.ts
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { PrismaService } from 'prisma/prisma.service';
+import { User, Role } from '@prisma/client';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateUserDto): Promise<User> {
-    // destructure everything Prisma expects, supply a default for `role`
     const {
       name,
       email,
@@ -17,24 +17,31 @@ export class UsersService {
       date_naissance,
       sexe,
       telephone,
-      adresse,            // note the field name matches your Prisma schema
+      adresse,
       piece_identite,
-      role = Role.BUYER,  // default if none provided
+      role = Role.BUYER,
     } = dto;
 
-    return this.prisma.user.create({
-      data: {
-        name,
-        email,
-        password,
-        date_naissance,
-        sexe,
-        telephone,
-        adresse,
-        piece_identite,
-        role,
-      },
-    });
+    try {
+      return await this.prisma.user.create({
+        data: {
+          name,
+          email,
+          password,
+          date_naissance: new Date(date_naissance),
+          sexe,
+          telephone,
+          adresse,
+          piece_identite,
+          role,
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2002') { // Code Prisma pour violation de contrainte unique
+        throw new ConflictException('Cet e-mail est déjà utilisé.');
+      }
+      throw error; // Relancer d'autres erreurs pour débogage
+    }
   }
 
   async findAll(): Promise<User[]> {

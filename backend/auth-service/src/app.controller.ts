@@ -10,7 +10,7 @@ import { AppService } from './app.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
-@Controller()
+ @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 

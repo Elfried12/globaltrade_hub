@@ -3,7 +3,7 @@ import { Controller, All, Req, Res, Param, Body, Query } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { ProxyService } from '../proxy/proxy.service';
 
-@Controller('api/:service')
+@Controller(':service')
 export class AppController {
   constructor(private readonly proxyService: ProxyService) {}
 

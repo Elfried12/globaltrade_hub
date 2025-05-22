@@ -1,10 +1,15 @@
+// lib/modules/auth/views/register_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+import 'package:frontend/modules/auth/services/auth_service.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/cupertino.dart';
 
 class RegisterView extends StatefulWidget {
-  const RegisterView({super.key});
+  
+  final AuthService authService;
+  const RegisterView({super.key, required this.authService});
 
   @override
   State<RegisterView> createState() => _RegisterViewState();
@@ -23,18 +28,17 @@ class _RegisterViewState extends State<RegisterView> {
   final _pieceIdentiteController = TextEditingController();
 
   DateTime? _dateNaissance;
-  String _selectedRole = 'utilisateur';
+  String _selectedRole = 'BUYER';      // BUYER, SUPPLIER ou OWNER
+  String? _selectedGender;             // 'M' ou 'F'
   bool _passwordVisible = false;
 
   // Design System Colors
   static const Color primaryColor = Color(0xFF6C63FF);
   static const Color secondaryColor = Color(0xFF32D74B);
-  static const Color accentColor = Color(0xFFFF6B6B);
   static const Color backgroundColor = Color(0xFFF7F9FC);
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color textPrimaryColor = Color(0xFF2D3748);
   static const Color textSecondaryColor = Color(0xFF718096);
-  static const Color errorColor = Color(0xFFE53E3E);
 
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
@@ -48,7 +52,7 @@ class _RegisterViewState extends State<RegisterView> {
     BoxShadow(
       color: Colors.black.withOpacity(0.05),
       blurRadius: 10,
-      offset: const Offset(0, 4),
+      offset: Offset(0, 4),
     ),
   ];
 
@@ -61,7 +65,7 @@ class _RegisterViewState extends State<RegisterView> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: primaryColor,
               onPrimary: Colors.white,
               surface: Colors.white,
@@ -78,9 +82,45 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   void _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-      await Future.delayed(const Duration(seconds: 2));
+    if (!_formKey.currentState!.validate()) return;
+    if (_dateNaissance == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Veuillez sélectionner votre date de naissance')),
+      );
+      return;
+    }
+    if (_selectedGender == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Veuillez sélectionner votre sexe')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final auth = Modular.get<AuthService>();
+      await auth.register(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        date_naissance: _dateNaissance!,
+        sexe: _selectedGender!,      // 'M' ou 'F'
+        telephone: _telephoneController.text.trim(),
+        adresse: _adresseController.text.trim(),
+        piece_identite: _pieceIdentiteController.text.trim(),
+        role: _selectedRole,         // 'BUYER', 'SUPPLIER' ou 'OWNER'
+      );
+      
+      Modular.to.pushReplacementNamed('/login');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Inscription réussie ! Veuillez vous connecter.')),
+        );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur : ${e.toString()}')),
+      );
+    } finally {
       setState(() => _isLoading = false);
     }
   }
@@ -123,17 +163,73 @@ class _RegisterViewState extends State<RegisterView> {
           ),
           SafeArea(
             child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                child: Form(
-                  key: _formKey,
-                  child: _buildForm(),
-                ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Form(
+                key: _formKey,
+                child: _buildForm(),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(),
+        SizedBox(height: 32),
+        _buildProgressIndicator(),
+        SizedBox(height: 24),
+
+        // Étape 1
+        if (_currentStep == 0) ...[
+          _buildField("Nom complet", _nameController,
+              prefixIcon: Icons.person_outline, hint: "Entrez votre nom complet"),
+          _buildField("Email professionnel", _emailController,
+              inputType: TextInputType.emailAddress,
+              prefixIcon: Icons.email_outlined,
+              hint: "exemple@entreprise.com",
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'L\'email est requis';
+                if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v))
+                  return 'Email invalide';
+                return null;
+              }),
+          _buildPasswordField(),
+          _buildGenderDropdown(),  // ← nouveau
+        ],
+
+        // Étape 2
+        if (_currentStep == 1) ...[
+          _buildField("Téléphone", _telephoneController,
+              inputType: TextInputType.phone,
+              prefixIcon: Icons.phone_outlined,
+              hint: "+229 XXXXXXXX",
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(8)
+              ]),
+          _buildField("Adresse professionnelle", _adresseController,
+              prefixIcon: Icons.location_on_outlined,
+              hint: "Quartier, Ville"),
+          _buildDatePicker(),
+        ],
+
+        // Étape 3
+        if (_currentStep == 2) ...[
+          _buildField("Numéro de pièce d'identité", _pieceIdentiteController,
+              prefixIcon: Icons.badge_outlined,
+              hint: "Numéro IFU ou Carte d'identité"),
+          _buildRoleDropdown(),  // inchangé
+        ],
+
+        SizedBox(height: 32),
+        _buildNavigationButtons(),
+        _buildLoginLink(),
+      ],
     );
   }
 
@@ -147,29 +243,21 @@ class _RegisterViewState extends State<RegisterView> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: softShadow,
           ),
-          child: Image.asset(
-            'assets/images/gthint.png',
-            height: 80,
-          ),
+          child: Image.asset('assets/images/gthint.png', height: 80),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
         Text(
           'Rejoignez GlobalTrade Hub',
           style: GoogleFonts.plusJakartaSans(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: textPrimaryColor,
-            height: 1.2,
+            fontSize: 28, fontWeight: FontWeight.bold, color: textPrimaryColor,
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Text(
           'Votre passerelle vers un commerce sécurisé',
           textAlign: TextAlign.center,
           style: GoogleFonts.plusJakartaSans(
-            fontSize: 16,
-            color: textSecondaryColor,
-            height: 1.5,
+            fontSize: 16, color: textSecondaryColor, height: 1.5,
           ),
         ),
       ],
@@ -210,18 +298,12 @@ class _RegisterViewState extends State<RegisterView> {
                     gradient: isActive ? primaryGradient : null,
                     color: isPast ? primaryColor : Colors.grey.shade200,
                     boxShadow: isActive
-                        ? [
-                            BoxShadow(
-                              color: primaryColor.withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
+                        ? [BoxShadow(color: primaryColor.withOpacity(0.3), blurRadius: 8, offset: Offset(0, 4))]
                         : null,
                   ),
                   child: Center(
                     child: isPast
-                        ? const Icon(Icons.check, color: Colors.white, size: 16)
+                        ? Icon(Icons.check, color: Colors.white, size: 16)
                         : Text(
                             '${index + 1}',
                             style: GoogleFonts.plusJakartaSans(
@@ -245,92 +327,56 @@ class _RegisterViewState extends State<RegisterView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 8),
-            child: Text(
-              'Mot de passe',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
+          Text('Mot de passe', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimaryColor)),
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: _passwordController,
+            obscureText: !_passwordVisible,
+            style: GoogleFonts.plusJakartaSans(fontSize: 15, color: textPrimaryColor),
+            decoration: InputDecoration(
+              hintText: '8 caractères minimum',
+              prefixIcon: Icon(Icons.lock_outline, color: textSecondaryColor, size: 20),
+              suffixIcon: IconButton(
+                icon: Icon(_passwordVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: textSecondaryColor),
+                onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+              ),
+              filled: true,
+              fillColor: surfaceColor,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: primaryColor.withOpacity(0.5), width: 1.5),
               ),
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: TextFormField(
-              controller: _passwordController,
-              obscureText: !_passwordVisible,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 15,
-                color: textPrimaryColor,
-              ),
-              decoration: InputDecoration(
-                hintText: '8 caractères minimum',
-                hintStyle: GoogleFonts.plusJakartaSans(
-                  color: textSecondaryColor.withOpacity(0.5),
-                  fontSize: 15,
-                ),
-                prefixIcon: Icon(
-                  Icons.lock_outline,
-                  color: textSecondaryColor,
-                  size: 20,
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _passwordVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                    color: textSecondaryColor,
-                    size: 20,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _passwordVisible = !_passwordVisible;
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: primaryColor.withOpacity(0.5),
-                    width: 1.5,
-                  ),
-                ),
-                filled: true,
-                fillColor: surfaceColor,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Le mot de passe est requis';
-                }
-                if (value.length < 8) {
-                  return 'Le mot de passe doit contenir au moins 8 caractères';
-                }
-                return null;
-              },
-            ),
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Le mot de passe est requis';
+              if (v.length < 8) return 'Doit contenir au moins 8 caractères';
+              return null;
+            },
           ),
         ],
+      ),
+    );
+  }
+
+  // Nouveau dropdown pour le sexe
+  Widget _buildGenderDropdown() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: DropdownButtonFormField<String>(
+        value: _selectedGender,
+        hint: Text('Sélectionnez votre sexe'),
+        items: const [
+          DropdownMenuItem(value: 'M', child: Text('Homme')),
+          DropdownMenuItem(value: 'F', child: Text('Femme')),
+        ],
+        onChanged: (v) => setState(() => _selectedGender = v),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: surfaceColor,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+        validator: (v) => v == null ? 'Champ obligatoire' : null,
       ),
     );
   }
@@ -349,72 +395,25 @@ class _RegisterViewState extends State<RegisterView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 8),
-            child: Text(
-              label,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
+          Text(label, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimaryColor)),
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: controller,
+            keyboardType: inputType,
+            inputFormatters: inputFormatters,
+            style: GoogleFonts.plusJakartaSans(fontSize: 15, color: textPrimaryColor),
+            decoration: InputDecoration(
+              hintText: hint,
+              prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: textSecondaryColor) : null,
+              filled: true,
+              fillColor: surfaceColor,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: primaryColor.withOpacity(0.5), width: 1.5),
               ),
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: TextFormField(
-              controller: controller,
-              keyboardType: inputType,
-              inputFormatters: inputFormatters,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 15,
-                color: textPrimaryColor,
-              ),
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: GoogleFonts.plusJakartaSans(
-                  color: textSecondaryColor.withOpacity(0.5),
-                  fontSize: 15,
-                ),
-                prefixIcon: Icon(
-                  prefixIcon,
-                  color: textSecondaryColor,
-                  size: 20,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: primaryColor.withOpacity(0.5),
-                    width: 1.5,
-                  ),
-                ),
-                filled: true,
-                fillColor: surfaceColor,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-              ),
-              validator: validator ??
-                  ((value) => (value == null || value.isEmpty) ? 'Ce champ est requis' : null),
-            ),
+            validator: validator ?? (v) => v == null || v.isEmpty ? 'Ce champ est requis' : null,
           ),
         ],
       ),
@@ -427,67 +426,32 @@ class _RegisterViewState extends State<RegisterView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 8),
-            child: Text(
-              'Date de naissance',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
-              ),
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: _pickDateNaissance,
+          Text('Date de naissance', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimaryColor)),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: _pickDateNaissance,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                color: surfaceColor,
                 borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: surfaceColor,
+                boxShadow: softShadow,
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.calendar_today_outlined, color: textSecondaryColor),
+                  const SizedBox(width: 12),
+                  Text(
+                    _dateNaissance == null
+                        ? 'Sélectionner une date'
+                        : 'Né(e) le ${_dateNaissance!.day}/${_dateNaissance!.month}/${_dateNaissance!.year}',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: _dateNaissance == null ? textSecondaryColor.withOpacity(0.5) : textPrimaryColor,
+                    ),
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        color: textSecondaryColor,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        _dateNaissance == null
-                            ? 'Sélectionner une date'
-                            : 'Né(e) le ${_dateNaissance!.day}/${_dateNaissance!.month}/${_dateNaissance!.year}',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 15,
-                          color: _dateNaissance == null
-                              ? textSecondaryColor.withOpacity(0.5)
-                              : textPrimaryColor,
-                        ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        color: textSecondaryColor.withOpacity(0.5),
-                        size: 16,
-                      ),
-                    ],
-                  ),
-                ),
+                  Spacer(),
+                  Icon(Icons.arrow_forward_ios_rounded, color: textSecondaryColor.withOpacity(0.5)),
+                ],
               ),
             ),
           ),
@@ -497,153 +461,75 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   Widget _buildRoleDropdown() {
+    // inchangé
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 8),
-            child: Text(
-              'Type de compte',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: textPrimaryColor,
-              ),
-            ),
-          ),
+          Text('Type de compte', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w600, color: textPrimaryColor)),
+          const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              boxShadow: softShadow,
             ),
             child: DropdownButtonFormField<String>(
               value: _selectedRole,
               items: [
                 DropdownMenuItem(
-                  value: 'utilisateur',
+                  value: 'BUYER',
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.shopping_cart_outlined,
-                          color: primaryColor,
-                          size: 18,
-                        ),
+                        decoration: BoxDecoration(color: primaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                        child: Icon(Icons.shopping_cart_outlined, color: primaryColor, size: 18),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        'Acheteur',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 15,
-                          color: textPrimaryColor,
-                        ),
-                      ),
+                      Text('Acheteur', style: GoogleFonts.plusJakartaSans(fontSize: 15, color: textPrimaryColor)),
                     ],
                   ),
                 ),
                 DropdownMenuItem(
-                  value: 'fournisseur',
+                  value: 'SUPPLIER',
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: secondaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.store_outlined,
-                          color: secondaryColor,
-                          size: 18,
-                        ),
+                        decoration: BoxDecoration(color: secondaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                        child: Icon(Icons.store_outlined, color: secondaryColor, size: 18),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        'Fournisseur',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 15,
-                          color: textPrimaryColor,
-                        ),
-                      ),
+                      Text('Fournisseur', style: GoogleFonts.plusJakartaSans(fontSize: 15, color: textPrimaryColor)),
                     ],
                   ),
                 ),
                 DropdownMenuItem(
-                  value: 'propriétaire',
+                  value: 'OWNER',
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: secondaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.local_shipping,
-                          color: const Color.fromARGB(255, 204, 20, 29),
-                          size: 18,
-                        ),
+                        decoration: BoxDecoration(color: secondaryColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                        child: Icon(Icons.local_shipping, color: secondaryColor, size: 18),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        'Propriétaire',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 15,
-                          color: textPrimaryColor,
-                        ),
-                      ),
+                      Text('Propriétaire', style: GoogleFonts.plusJakartaSans(fontSize: 15, color: textPrimaryColor)),
                     ],
                   ),
                 ),
               ],
-              onChanged: (val) => setState(() => _selectedRole = val!),
+              onChanged: (v) => setState(() => _selectedRole = v!),
               decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(
-                    color: primaryColor.withOpacity(0.5),
-                    width: 1.5,
-                  ),
-                ),
                 filled: true,
                 fillColor: surfaceColor,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: primaryColor.withOpacity(0.5), width: 1.5),
                 ),
               ),
-              icon: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: textSecondaryColor,
-                size: 24,
-              ),
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 15,
-                color: textPrimaryColor,
-              ),
-              dropdownColor: surfaceColor,
-              isExpanded: true,
             ),
           ),
         ],
@@ -652,233 +538,41 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   Widget _buildNavigationButtons() {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      child: Row(
-        children: [
-          if (_currentStep > 0)
-            Expanded(
-              child: Container(
-                height: 56,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: primaryColor.withOpacity(0.5)),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () {
-                      setState(() {
-                        _currentStep--;
-                      });
-                    },
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.arrow_back_ios_rounded,
-                            size: 16,
-                            color: primaryColor,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Précédent',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: primaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          if (_currentStep > 0) const SizedBox(width: 16),
-          Expanded(
-            child: Container(
-              height: 56,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: primaryGradient,
-                boxShadow: [
-                  BoxShadow(
-                    color: primaryColor.withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: _isLoading
-                      ? null
-                      : () {
-                          if (_currentStep < 2) {
-                            setState(() {
-                              _currentStep++;
-                            });
-                          } else {
-                            _submitForm();
-                          }
-                        },
-                  child: Center(
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _currentStep < 2 ? 'Suivant' : 'Créer mon compte',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              if (_currentStep < 2) ...[
-                                const SizedBox(width: 8),
-                                const Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                              ],
-                            ],
-                          ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Row(
       children: [
-        _buildHeader(),
-        const SizedBox(height: 32),
-        _buildProgressIndicator(),
-        const SizedBox(height: 24),
-        if (_currentStep == 0) ...[
-          _buildField(
-            "Nom complet",
-            _nameController,
-            prefixIcon: Icons.person_outline,
-            hint: "Entrez votre nom complet",
-          ),
-          _buildField(
-            "Email professionnel",
-            _emailController,
-            inputType: TextInputType.emailAddress,
-            prefixIcon: Icons.email_outlined,
-            hint: "exemple@entreprise.com",
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'L\'email est requis';
-              }
-              if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                return 'Email invalide';
-              }
-              return null;
-            },
-          ),
-          _buildPasswordField(),
-        ],
-        if (_currentStep == 1) ...[
-          _buildField(
-            "Téléphone",
-            _telephoneController,
-            inputType: TextInputType.phone,
-            prefixIcon: Icons.phone_outlined,
-            hint: "+229 XXXXXXXX",
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(8),
-            ],
-          ),
-          _buildField(
-            "Adresse professionnelle",
-            _adresseController,
-            prefixIcon: Icons.location_on_outlined,
-            hint: "Quartier, Ville",
-          ),
-          _buildDatePicker(),
-        ],
-        if (_currentStep == 2) ...[
-          _buildField(
-            "Numéro de pièce d'identité",
-            _pieceIdentiteController,
-            prefixIcon: Icons.badge_outlined,
-            hint: "Numéro IFU ou Carte d'identité",
-          ),
-          _buildRoleDropdown(),
-          const SizedBox(height: 16),
-          Text(
-            'En vous inscrivant, vous acceptez nos conditions d\'utilisation et notre politique de confidentialité',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 13,
-              color: textSecondaryColor,
+        if (_currentStep > 0)
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () => setState(() => _currentStep--),
+              child: Text('Précédent'),
             ),
           ),
-        ],
-        const SizedBox(height: 32),
-        _buildNavigationButtons(),
-        _buildLoginLink(),
+        if (_currentStep > 0) const SizedBox(width: 16),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: _isLoading
+                ? null
+                : () {
+                    if (_currentStep < 2) setState(() => _currentStep++);
+                    else _submitForm();
+                  },
+            child: _isLoading
+                ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : Text(_currentStep < 2 ? 'Suivant' : 'Créer mon compte'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: primaryColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildLoginLink() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: TextButton(
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, '/auth');
-        },
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: RichText(
-          text: TextSpan(
-            style: GoogleFonts.plusJakartaSans(fontSize: 15),
-            children: [
-              TextSpan(
-                text: 'Déjà membre ? ',
-                style: TextStyle(color: textSecondaryColor),
-              ),
-              TextSpan(
-                text: 'Se connecter',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return TextButton(
+      onPressed: () => Modular.to.pushReplacementNamed('/auth/login'),
+      child: Text("Déjà membre ? Se connecter"),
     );
   }
 }
