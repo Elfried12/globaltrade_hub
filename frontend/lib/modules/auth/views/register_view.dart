@@ -111,7 +111,7 @@ class _RegisterViewState extends State<RegisterView> {
         role: _selectedRole,         // 'BUYER', 'SUPPLIER' ou 'OWNER'
       );
       
-      Modular.to.pushReplacementNamed('/login');
+      Modular.to.pushReplacementNamed('/auth/login');
 
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Inscription réussie ! Veuillez vous connecter.')),

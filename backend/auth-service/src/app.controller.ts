@@ -32,13 +32,14 @@ export class AppController {
     }
   }
 
+  
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     try {
       const result = await this.appService.login(loginDto);
       return {
         message: 'Connexion réussie.',
-        accessToken: result.access_token,
+        accessToken: result.accessToken,
         user: result.user,
       };
     } catch (error) {

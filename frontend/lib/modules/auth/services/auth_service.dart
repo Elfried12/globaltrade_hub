@@ -51,6 +51,12 @@ class AuthService {
     required String email,
     required String password,
   }) async {
+
+    // Validation des champs obligatoires
+    if (email.isEmpty || password.isEmpty) {
+      throw Exception('L\'email et le mot de passe sont requis');
+    }
+
     final uri = Uri.parse('$baseUrl/login');
     final res = await http.post(
       uri,
@@ -58,7 +64,7 @@ class AuthService {
       body: jsonEncode({'email': email, 'password': password}),
     );
 
-    if (res.statusCode != 200) {
+    if (res.statusCode != 200 &&res.statusCode != 201) {
       final Map<String, dynamic> err = jsonDecode(res.body);
       final message = err['message'] ?? res.reasonPhrase;
       throw Exception('Login failed (${res.statusCode}): $message');

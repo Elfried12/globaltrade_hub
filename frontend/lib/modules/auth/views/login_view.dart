@@ -3,9 +3,12 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:frontend/modules/auth/services/auth_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/design_system.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({super.key, required AuthService authService});
+  final AuthService authService;
+
+  const LoginView({super.key, required this.authService});
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -13,10 +16,13 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController    = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
-  bool _isLoading       = false;
+  bool _isLoading = false;
+
+  // Accéder à authService via widget
+  AuthService get authService => widget.authService;
 
   @override
   void dispose() {
@@ -26,47 +32,57 @@ class _LoginViewState extends State<LoginView> {
   }
 
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isLoading = true);
-
-    try {
-      final auth = Modular.get<AuthService>();
-      final response = await auth.login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-
-      // 1) Stocke le token
-      final token = response['accessToken'] as String;
-      // TODO: sauvegarde dans SecureStorage ou SharedPreferences
-
-      // 2) Lis le role
-      final user = response['user'] as Map<String, dynamic>;
-      final role = user['role'] as String;
-
-      // 3) Redirige selon le rôle
-      switch (role) {
-        case 'BUYER':
-          Modular.to.pushReplacementNamed('/dashboard/');
-          break;
-        case 'SUPPLIER':
-          Modular.to.pushReplacementNamed('/dashboard/fournisseur');
-          break;
-        case 'OWNER':
-          Modular.to.pushReplacementNamed('/dashboard/proprietaire');
-          break;
-        default:
-          Modular.to.pushReplacementNamed('/');
-      }
-    } catch (e) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
+  if (!_formKey.currentState!.validate()) return;
+  final email = _emailController.text.trim();
+  final password = _passwordController.text;
+  if (email.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Veuillez remplir tous les champs')),
+    );
+    return;
   }
+  setState(() => _isLoading = true);
+
+  try {
+    final response = await authService.login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
+
+    // 1) Stocke le token
+    const storage = FlutterSecureStorage();
+    final token = response['accessToken'] as String;
+    await storage.write(key: 'auth_token', value: token);
+
+    // 2) Lis le rôle
+    final user = response['user'] as Map<String, dynamic>;
+    final role = user['role'] as String;
+
+    // 3) Redirige selon le rôle
+    switch (role) {
+      case 'BUYER':
+        Modular.to.pushReplacementNamed('/'); // Route par défaut pour utilisateur
+        break;
+      case 'SUPPLIER':
+        Modular.to.pushReplacementNamed('/dashboard/fournisseur/'); // Route pour fournisseur
+        break;
+      case 'OWNER':
+        Modular.to.pushReplacementNamed(''); // Route pour propriétaire/admin
+        break;
+      default:
+        Modular.to.pushReplacementNamed('/');
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Connexion réussie ! Bienvenue sur votre dashboard.')),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erreur de connexion : ${e.toString()}')),
+    );
+  } finally {
+    setState(() => _isLoading = false);
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -267,7 +283,7 @@ class _LoginViewState extends State<LoginView> {
 
   Widget _buildRegisterLink() {
     return TextButton(
-      onPressed: () => Modular.to.pushReplacementNamed('/register'),
+      onPressed: () => Modular.to.pushReplacementNamed('/auth/register'),
       child: RichText(
         text: TextSpan(
           style: GoogleFonts.plusJakartaSans(fontSize: 15),

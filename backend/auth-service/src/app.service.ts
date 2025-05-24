@@ -37,30 +37,40 @@ export class AppService {
     };
   }
 
-  async login(body: { email: string; password: string }) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: body.email },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Email ou mot de passe incorrect');
-    }
-
-    const isPasswordValid = await bcrypt.compare(body.password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Email ou mot de passe incorrect');
-    }
-
-    const access_token = await this.jwtService.signAsync({ sub: user.id });
-
-    return {
-      access_token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    };
+  
+async login(body: { email: string; password: string }) {
+  if (!body.email || !body.password) {
+    throw new UnauthorizedException('Email et mot de passe sont requis');
   }
+
+  console.log('Recherche de l\'utilisateur avec email :', body.email);
+  const user = await this.prisma.user.findUnique({
+    where: { email: body.email },
+  });
+
+  if (!user) {
+    console.log('Utilisateur non trouvé pour email :', body.email);
+    throw new UnauthorizedException('Email ou mot de passe incorrect');
+  }
+
+  console.log('Mot de passe haché dans la base :', user.password);
+  console.log('Mot de passe fourni :', body.password);
+  const isPasswordValid = await bcrypt.compare(body.password, user.password);
+  if (!isPasswordValid) {
+    console.log('Mot de passe invalide pour email :', body.email);
+    throw new UnauthorizedException('Email ou mot de passe incorrect');
+  }
+
+  console.log('Connexion réussie pour utilisateur :', user.email);
+  const access_token = await this.jwtService.signAsync({ sub: user.id });
+
+  return {
+    accessToken: access_token,
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    },
+  };
+}
 }
